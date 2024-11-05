@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification Livreur - ExpressDelivery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo-link">
+                <div class="logo">
+                    <img src="logo-transparent-png.png" alt="ExpressDelivery" class="nav-logo">
+                </div>
+            </a>
+            <ul>
+                <li><a href="index.html">Retour à l'accueil</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="verification-page">
+        <div class="verification-container">
+            <div class="progress-bar">
+                <div class="step active">1. Informations</div>
+                <div class="step">2. Documents</div>
+                <div class="step">3. Validation</div>
+            </div>
+
+            <form id="verificationForm" class="verification-form">
+                <div class="form-section" id="step1">
+                    <h2>Informations personnelles</h2>
+                    <div class="form-group">
+                        <label for="firstName">Prénom</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Nom</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="birthDate">Date de naissance</label>
+                        <input type="date" id="birthDate" name="birthDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Téléphone</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="next-btn">Suivant</button>
+                    </div>
+                </div>
+
+                <div class="form-section hidden" id="step2">
+                    <h2>Vérification d'identité</h2>
+                    <div class="form-group">
+                        <label for="selfie">Photo de profil (selfie)</label>
+                        <div class="upload-zone" id="selfieUpload">
+                            <input type="file" id="selfie" name="selfie" accept="image/*" required>
+                            <div class="upload-preview">
+                                <img id="selfiePreview" src="#" alt="Aperçu" style="display: none;">
+                            </div>
+                            <p class="upload-instructions">Prenez une photo claire de votre visage</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="idCardFront">Carte d'identité (Recto)</label>
+                        <div class="upload-zone" id="idFrontUpload">
+                            <input type="file" id="idCardFront" name="idCardFront" accept="image/*" required>
+                            <div class="upload-preview">
+                                <img id="idFrontPreview" src="#" alt="Aperçu" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="idCardBack">Carte d'identité (Verso)</label>
+                        <div class="upload-zone" id="idBackUpload">
+                            <input type="file" id="idCardBack" name="idCardBack" accept="image/*" required>
+                            <div class="upload-preview">
+                                <img id="idBackPreview" src="#" alt="Aperçu" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="verification-tips">
+                        <h3>Conseils pour la vérification :</h3>
+                        <ul>
+                            <li>✓ Assurez-vous que les documents sont bien éclairés</li>
+                            <li>✓ Tous les coins doivent être visibles</li>
+                            <li>✓ Les informations doivent être lisibles</li>
+                            <li>✓ Pas de reflets ni de flou</li>
+                        </ul>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="prev-btn">Précédent</button>
+                        <button type="button" class="next-btn">Suivant</button>
+                    </div>
+                </div>
+
+                <div class="form-section hidden" id="step3">
+                    <h2>Documents requis</h2>
+                    <div class="form-group">
+                        <label for="idCard">Carte d'identité (recto/verso)</label>
+                        <input type="file" id="idCard" name="idCard" accept="image/*" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="drivingLicense">Permis de conduire</label>
+                        <input type="file" id="drivingLicense" name="drivingLicense" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="insurance">Attestation d'assurance</label>
+                        <input type="file" id="insurance" name="insurance" accept="image/*,application/pdf" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleRegistration">Carte grise du véhicule</label>
+                        <input type="file" id="vehicleRegistration" name="vehicleRegistration" accept="image/*,application/pdf">
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="prev-btn">Précédent</button>
+                        <button type="button" class="next-btn">Suivant</button>
+                    </div>
+                </div>
+
+                <div class="form-section hidden" id="step3">
+                    <h2>Validation</h2>
+                    <div class="terms-container">
+                        <h3>Conditions générales</h3>
+                        <div class="terms-scroll">
+                            <p>En devenant livreur partenaire, vous acceptez nos conditions générales...</p>
+                            <!-- Ajoutez ici vos conditions -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            J'accepte les conditions générales
+                        </label>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="prev-btn">Précédent</button>
+                        <button type="submit" class="submit-btn">Finaliser l'inscription</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="verification.js"></script>
+</body>
+</html> 
