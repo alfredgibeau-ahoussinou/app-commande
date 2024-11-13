@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpressDelivery - Connexion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .logo-container img {
+            width: 120px;
+            height: auto;
+        }
+
+        h1 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .phone-input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .phone-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .phone-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .phone-input:focus {
+            border-color: white;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: white;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .error-message {
+            color: #ff4444;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="send-check.html" class="back-btn">
+        ← Retour
+    </a>
+
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="logo-transparent-png.png" alt="ExpressDelivery Logo">
+        </div>
+        <h1>Connexion</h1>
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+            <div class="phone-input-container">
+                <input 
+                    type="tel" 
+                    id="phone" 
+                    class="phone-input" 
+                    placeholder="Numéro de téléphone"
+                    pattern="[0-9]{10}"
+                    required
+                >
+            </div>
+            <button type="submit" class="submit-btn">Recevoir le code</button>
+            <p class="error-message" id="errorMessage"></p>
+        </form>
+        
+        <div class="test-info">
+            <p style="color: white; font-size: 14px; margin-top: 20px;">
+                Pour tester : +33 6 00 00 00 00
+                <br>
+                Code de test : 123456
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration du reCAPTCHA (invisible)
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('submit-btn', {
+            'size': 'invisible',
+            'callback': (response) => {
+                // reCAPTCHA résolu, permettre l'envoi du SMS
+                onSignInSubmit();
+            }
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const phoneInput = document.getElementById('phone');
+            const errorMessage = document.getElementById('errorMessage');
+            const phone = phoneInput.value.trim().replace(/\s/g, '');
+
+            // Validation du numéro de téléphone
+            if (!/^[0-9]{10}$/.test(phone)) {
+                errorMessage.textContent = "Veuillez entrer un numéro de téléphone valide";
+                errorMessage.style.display = "block";
+                return false;
+            }
+
+            // Formater le numéro au format international (France)
+            const phoneNumber = '+33' + phone.substring(1);
+
+            // Pour le numéro de test
+            if (phoneNumber === '+33600000000') {
+                // Simuler l'envoi du code pour le numéro de test
+                localStorage.setItem('userPhone', phone);
+                localStorage.setItem('isTestNumber', 'true');
+                window.location.href = 'phone-verification.html';
+                return false;
+            }
+
+            // Désactiver le bouton pendant l'envoi
+            document.querySelector('.submit-btn').disabled = true;
+
+            // Envoyer le code par SMS (pour les vrais numéros)
+            firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+                .then((confirmationResult) => {
+                    window.confirmationResult = confirmationResult;
+                    localStorage.setItem('userPhone', phone);
+                    window.location.href = 'phone-verification.html';
+                })
+                .catch((error) => {
+                    console.error(error);
+                    errorMessage.textContent = "Erreur lors de l'envoi du SMS. Veuillez réessayer.";
+                    errorMessage.style.display = "block";
+                    document.querySelector('.submit-btn').disabled = false;
+                });
+            
+            return false;
+        }
+
+        // Formater le numéro pendant la saisie
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,2})(\d{0,2})(\d{0,2})(\d{0,2})/);
+            e.target.value = !x[2] ? x[1] : x[1] + ' ' + x[2] + (x[3] ? ' ' + x[3] : '') + (x[4] ? ' ' + x[4] : '') + (x[5] ? ' ' + x[5] : '');
+        });
+    </script>
+
+    <script>
+        const firebaseConfig = {
+            // Remplacez par vos configurations Firebase
+            apiKey: "votre-api-key",
+            authDomain: "votre-project.firebaseapp.com",
+            projectId: "votre-project-id",
+            storageBucket: "votre-project.appspot.com",
+            messagingSenderId: "votre-messaging-sender-id",
+            appId: "votre-app-id"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+</body>
+</html> 

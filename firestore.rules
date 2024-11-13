@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Fonction pour vérifier si l'utilisateur est authentifié
+    function isAuth() {
+      return request.auth != null;
+    }
+    
+    // Fonction pour vérifier si l'utilisateur est propriétaire
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Collection users
+    match /users/{userId} {
+      allow read: if isAuth() && isOwner(userId);
+      allow write: if isAuth() && isOwner(userId);
+      
+      // Sous-collection de tokens
+      match /messagingTokens/{tokenId} {
+        allow read, write: if isAuth() && isOwner(userId);
+      }
+      
+      // Autoriser la mise à jour de certains champs spécifiques
+      allow update: if isAuth() && isOwner(userId) && 
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['fullName', 'email', 'address', 'notifications', 'updatedAt']);
+      
+      // Autoriser la création initiale du profil
+      allow create: if isAuth() && isOwner(userId);
+    }
+
+    // Règles pour les préférences de notification
+    match /users/{userId}/notifications/{notifId} {
+      allow read, write: if isAuth() && isOwner(userId);
+    }
+
+    // Collection shipments (colis)
+    match /shipments/{shipmentId} {
+      allow read: if isAuth() && (
+        resource.data.senderId == request.auth.uid || 
+        resource.data.recipientId == request.auth.uid
+      );
+      allow create: if isAuth();
+      allow update: if isAuth() && resource.data.senderId == request.auth.uid;
+    }
+
+    // Collection tracking_history
+    match /tracking_history/{historyId} {
+      allow read: if isAuth() && exists(/databases/$(database)/documents/shipments/$(resource.data.trackingId));
+      allow create: if isAuth() && exists(/databases/$(database)/documents/shipments/$(request.resource.data.trackingId));
+    }
+
+    // Collection mail (pour les notifications email)
+    match /mail/{mailId} {
+      allow read: if false;  // Seules les Cloud Functions peuvent lire
+      allow create: if isAuth();  // Les utilisateurs peuvent créer des demandes d'email
+    }
+  }
+} 

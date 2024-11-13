@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpressDelivery - Envoyer un colis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            font-display: swap;
+        }
+
+        .check-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            width: 90%;
+            max-width: 400px;
+            margin: 20px;
+            will-change: transform;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .logo-container img {
+            width: 120px;
+            height: auto;
+        }
+
+        h1 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .description {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .send-button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .send-button.guest {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .send-button.account {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .send-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .send-button.guest:hover {
+            background: white;
+        }
+
+        .send-button.account:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .icon {
+            font-size: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .check-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .description {
+                font-size: 14px;
+            }
+
+            .send-button {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+
+        .logo-container a:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-container a:active {
+            transform: scale(0.95);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body {
+                animation: none;
+            }
+            
+            .send-button:hover {
+                transform: none;
+            }
+        }
+    </style>
+    <meta name="description" content="Envoyez facilement vos colis avec ExpressDelivery">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+</head>
+<body>
+    <div class="check-container" role="main">
+        <div class="logo-container">
+            <a href="index.html" aria-label="Retour à l'accueil ExpressDelivery">
+                <img src="logo-transparent-png.png" alt="ExpressDelivery Logo" width="120" height="120">
+            </a>
+        </div>
+        <h1>Envoyer un colis</h1>
+        <p class="description">
+            Choisissez comment vous souhaitez procéder pour envoyer votre colis
+        </p>
+        <div class="button-container">
+            <a href="send-package.html" class="send-button guest" role="button">
+                <span class="icon" aria-hidden="true">📦</span>
+                <span>Envoyer sans compte</span>
+            </a>
+            <a href="login.html" class="send-button account" role="button">
+                <span class="icon" aria-hidden="true">👤</span>
+                <span>Utiliser mon compte</span>
+            </a>
+        </div>
+    </div>
+    <script src="transition.js"></script>
+</body>
+</html> 

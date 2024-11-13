@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique des envois - ExpressDelivery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .history-container {
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+        }
+
+        .filters {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-input {
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+        }
+
+        .filter-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .shipment-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .shipment-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .shipment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .tracking-number {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .shipment-date {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .shipment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-delivered {
+            background: #4CAF50;
+        }
+
+        .status-transit {
+            background: #2196F3;
+        }
+
+        .status-pending {
+            background: #FFC107;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .page-btn.active {
+            background: white;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .history-container {
+                padding: 10px;
+            }
+
+            .shipment-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="history-container">
+        <header class="header">
+            <a href="dashboard.html" class="back-btn">← Retour au tableau de bord</a>
+            <h1 style="color: white; margin: 0;">Historique des envois</h1>
+        </header>
+
+        <div class="filters">
+            <input type="text" class="filter-input" placeholder="Rechercher un numéro de suivi" onkeyup="filterShipments()">
+            <select class="filter-input" onchange="filterShipments()">
+                <option value="">Tous les statuts</option>
+                <option value="delivered">Livré</option>
+                <option value="transit">En transit</option>
+                <option value="pending">En attente</option>
+            </select>
+            <input type="date" class="filter-input" onchange="filterShipments()">
+        </div>
+
+        <div id="shipmentsList">
+            <!-- Les envois seront générés dynamiquement ici -->
+        </div>
+
+        <div class="pagination">
+            <button class="page-btn" onclick="changePage(-1)">Précédent</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn" onclick="changePage(1)">Suivant</button>
+        </div>
+    </div>
+
+    <script>
+        let lastVisible = null;
+        const ITEMS_PER_PAGE = 5;
+        let currentFilters = {
+            status: '',
+            date: '',
+            search: ''
+        };
+
+        // Vérifier si l'utilisateur est connecté et initialiser Firebase
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Charger les premiers envois
+            loadShipments();
+
+            // Écouter les changements en temps réel
+            subscribeToShipments();
+        });
+
+        // Charger les envois depuis Firestore
+        async function loadShipments(isNextPage = false) {
+            const userId = localStorage.getItem('userId');
+            const shipmentsList = document.getElementById('shipmentsList');
+            
+            try {
+                let query = firebase.firestore()
+                    .collection('shipments')
+                    .where('senderId', '==', userId)
+                    .orderBy('date', 'desc')
+                    .limit(ITEMS_PER_PAGE);
+
+                // Appliquer les filtres
+                if (currentFilters.status) {
+                    query = query.where('status', '==', currentFilters.status);
+                }
+                if (currentFilters.date) {
+                    const selectedDate = new Date(currentFilters.date);
+                    const nextDay = new Date(selectedDate);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    query = query.where('date', '>=', selectedDate)
+                               .where('date', '<', nextDay);
+                }
+                if (currentFilters.search) {
+                    query = query.where('trackingNumber', '>=', currentFilters.search)
+                               .where('trackingNumber', '<=', currentFilters.search + '\uf8ff');
+                }
+
+                // Pagination
+                if (isNextPage && lastVisible) {
+                    query = query.startAfter(lastVisible);
+                }
+
+                const snapshot = await query.get();
+                
+                // Mettre à jour le dernier document visible pour la pagination
+                lastVisible = snapshot.docs[snapshot.docs.length - 1];
+
+                // Mettre à jour les boutons de pagination
+                updatePaginationButtons(snapshot.docs.length === ITEMS_PER_PAGE);
+
+                if (!isNextPage) {
+                    shipmentsList.innerHTML = '';
+                }
+
+                snapshot.forEach(doc => {
+                    const shipment = doc.data();
+                    const shipmentCard = createShipmentCard(doc.id, shipment);
+                    shipmentsList.appendChild(shipmentCard);
+                });
+
+            } catch (error) {
+                console.error('Erreur lors du chargement des envois:', error);
+                shipmentsList.innerHTML = '<p style="color: white;">Erreur lors du chargement des envois.</p>';
+            }
+        }
+
+        // Écouter les mises à jour en temps réel
+        function subscribeToShipments() {
+            const userId = localStorage.getItem('userId');
+            
+            firebase.firestore()
+                .collection('shipments')
+                .where('senderId', '==', userId)
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'modified') {
+                            updateShipmentCard(change.doc.id, change.doc.data());
+                        }
+                    });
+                });
+        }
+
+        // Créer une carte d'envoi
+        function createShipmentCard(id, shipment) {
+            const div = document.createElement('div');
+            div.className = 'shipment-card';
+            div.id = `shipment-${id}`;
+            div.onclick = () => window.location.href = `tracking.html?id=${id}`;
+            
+            div.innerHTML = `
+                <div class="shipment-header">
+                    <span class="tracking-number">${shipment.trackingNumber}</span>
+                    <span class="status-badge status-${shipment.status}">
+                        ${getStatusLabel(shipment.status)}
+                    </span>
+                </div>
+                <div class="shipment-date">${formatDate(shipment.date)}</div>
+                <div class="shipment-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Expédition</div>
+                        <div class="detail-value">${shipment.from}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Destination</div>
+                        <div class="detail-value">${shipment.to}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Poids</div>
+                        <div class="detail-value">${shipment.weight}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Prix</div>
+                        <div class="detail-value">${shipment.price}</div>
+                    </div>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // Mettre à jour une carte d'envoi existante
+        function updateShipmentCard(id, shipment) {
+            const card = document.getElementById(`shipment-${id}`);
+            if (card) {
+                card.innerHTML = createShipmentCard(id, shipment).innerHTML;
+            }
+        }
+
+        // Filtrer les envois
+        function filterShipments() {
+            currentFilters = {
+                status: document.querySelector('select').value,
+                date: document.querySelector('input[type="date"]').value,
+                search: document.querySelector('input[type="text"]').value.trim()
+            };
+            
+            lastVisible = null; // Réinitialiser la pagination
+            loadShipments();
+        }
+
+        // Gérer la pagination
+        function changePage(delta) {
+            if (delta > 0 && lastVisible) {
+                loadShipments(true);
+            } else if (delta < 0) {
+                // Implémenter la pagination précédente si nécessaire
+                // Nécessite de stocker les points de départ précédents
+            }
+        }
+
+        // Mettre à jour les boutons de pagination
+        function updatePaginationButtons(hasMore) {
+            const nextButton = document.querySelector('.page-btn[onclick="changePage(1)"]');
+            if (nextButton) {
+                nextButton.style.display = hasMore ? 'block' : 'none';
+            }
+        }
+
+        // Fonctions utilitaires
+        function getStatusLabel(status) {
+            const labels = {
+                delivered: 'Livré',
+                transit: 'En transit',
+                pending: 'En attente'
+            };
+            return labels[status] || status;
+        }
+
+        function formatDate(timestamp) {
+            if (timestamp instanceof firebase.firestore.Timestamp) {
+                timestamp = timestamp.toDate();
+            }
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(timestamp).toLocaleDateString('fr-FR', options);
+        }
+    </script>
+</body>
+</html> 

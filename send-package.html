@@ -3,192 +3,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Envoyer un colis - ExpressDelivery</title>
+    <title>ExpressDelivery - Envoyer un colis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #004d40, #00695c, #01579b, #0277bd);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .package-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            width: 90%;
+            max-width: 500px;
+            margin: 20px;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .logo-container a {
+            cursor: pointer;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container img {
+            width: 120px;
+            height: auto;
+        }
+
+        .logo-container a:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            color: white;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-input:focus {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .package-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .submit-button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            color: #004d40;
+            width: 100%;
+            max-width: 300px;
+            margin: 15px auto;
+            display: block;
+        }
+
+        .submit-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background: white;
+        }
+
+        .submit-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        textarea.form-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        @media (max-width: 480px) {
+            .package-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .package-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto 40px;
+        }
+
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-step.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #004d40;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%);
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .prev-button {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            color: white;
+        }
+
+        .next-button {
+            background: rgba(255, 255, 255, 0.9);
+            color: #004d40;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .next-button:hover:not(:disabled) {
+            background: white;
+        }
+
+        .prev-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="index.html" class="logo-link">
-                <div class="logo">
-                    <img src="logo-transparent-png.png" alt="ExpressDelivery" class="nav-logo">
-                </div>
+    <div class="package-container">
+        <div class="logo-container">
+            <a href="index.html">
+                <img src="logo-transparent-png.png" alt="ExpressDelivery Logo">
             </a>
-            <ul>
-                <li><a href="index.html">Retour à l'accueil</a></li>
-            </ul>
-        </nav>
-    </header>
+        </div>
 
-    <main class="verification-page">
-        <div class="verification-container">
-            <div class="progress-bar">
-                <div class="step active">1. Expéditeur</div>
-                <div class="step">2. Destinataire</div>
-                <div class="step">3. Colis</div>
+        <div class="progress-bar">
+            <div class="progress-step active">1</div>
+            <div class="progress-step">2</div>
+            <div class="progress-step">3</div>
+        </div>
+
+        <form id="packageForm">
+            <!-- Étape 1: Adresses -->
+            <div class="step-content active" id="step1">
+                <h1>Adresses</h1>
+                <div class="form-group">
+                    <label class="form-label">Adresse de collecte</label>
+                    <input type="text" class="form-input" name="pickup" required placeholder="Où récupérer le colis ?">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Adresse de livraison</label>
+                    <input type="text" class="form-input" name="delivery" required placeholder="Où livrer le colis ?">
+                </div>
             </div>
 
-            <form id="packageForm" class="verification-form">
-                <!-- Étape 1: Informations expéditeur -->
-                <div class="form-section" id="step1">
-                    <h2>Informations expéditeur</h2>
+            <!-- Étape 2: Détails du colis -->
+            <div class="step-content" id="step2">
+                <h1>Détails du colis</h1>
+                <div class="package-details">
                     <div class="form-group">
-                        <label for="senderName">Nom complet</label>
-                        <input type="text" id="senderName" name="senderName" required>
+                        <label class="form-label">Poids (kg)</label>
+                        <input type="number" class="form-input" name="weight" required min="0" step="0.1" placeholder="Ex: 2.5">
                     </div>
                     <div class="form-group">
-                        <label for="senderPhone">Téléphone</label>
-                        <input type="tel" id="senderPhone" name="senderPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="senderEmail">Email</label>
-                        <input type="email" id="senderEmail" name="senderEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="pickupAddress">Adresse de ramassage</label>
-                        <input type="text" id="pickupAddress" name="pickupAddress" required>
-                    </div>
-                    <div class="form-buttons">
-                        <button type="button" class="next-btn">Suivant</button>
+                        <label class="form-label">Dimensions (cm)</label>
+                        <input type="text" class="form-input" name="dimensions" required placeholder="L x l x h">
                     </div>
                 </div>
-
-                <!-- Étape 2: Informations destinataire -->
-                <div class="form-section hidden" id="step2">
-                    <h2>Informations destinataire</h2>
-                    <div class="form-group">
-                        <label for="receiverName">Nom du destinataire</label>
-                        <input type="text" id="receiverName" name="receiverName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="receiverPhone">Téléphone du destinataire</label>
-                        <input type="tel" id="receiverPhone" name="receiverPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="deliveryAddress">Adresse de livraison</label>
-                        <input type="text" id="deliveryAddress" name="deliveryAddress" required>
-                    </div>
-                    <div class="form-buttons">
-                        <button type="button" class="prev-btn">Précédent</button>
-                        <button type="button" class="next-btn">Suivant</button>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Description du colis</label>
+                    <textarea class="form-input" name="description" required placeholder="Décrivez votre colis..."></textarea>
                 </div>
+            </div>
 
-                <!-- Étape 3: Informations colis -->
-                <div class="form-section hidden" id="step3">
-                    <h2>Informations du colis</h2>
-                    
-                    <!-- Ajout de la capture vidéo -->
-                    <div class="form-group video-capture">
-                        <label>Vérification vidéo du colis</label>
-                        <div class="video-container">
-                            <video id="videoPreview" autoplay playsinline></video>
-                            <canvas id="videoCanvas" style="display: none;"></canvas>
-                            <div class="video-controls">
-                                <button type="button" id="startVideo" class="video-btn">📹 Démarrer la caméra</button>
-                                <button type="button" id="captureVideo" class="video-btn" disabled>📸 Capturer</button>
-                            </div>
-                        </div>
-                        <div class="video-preview"></div>
-                    </div>
-
-                    <!-- Style amélioré pour le type de colis -->
-                    <div class="package-type-selector">
-                        <h3>Type de colis</h3>
-                        <div class="package-options">
-                            <div class="package-option">
-                                <input type="radio" id="small" name="packageType" value="small" required>
-                                <label for="small">
-                                    <div class="package-icon">📦</div>
-                                    <div class="package-info">
-                                        <h4>Petit colis</h4>
-                                        <p>Max 5kg</p>
-                                        <ul>
-                                            <li>Dimensions max: 30x30x30cm</li>
-                                            <li>Idéal pour petits objets</li>
-                                        </ul>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="package-option">
-                                <input type="radio" id="medium" name="packageType" value="medium">
-                                <label for="medium">
-                                    <div class="package-icon">📦📦</div>
-                                    <div class="package-info">
-                                        <h4>Moyen colis</h4>
-                                        <p>Max 15kg</p>
-                                        <ul>
-                                            <li>Dimensions max: 50x50x50cm</li>
-                                            <li>Pour objets de taille moyenne</li>
-                                        </ul>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="package-option">
-                                <input type="radio" id="large" name="packageType" value="large">
-                                <label for="large">
-                                    <div class="package-icon">📦📦📦</div>
-                                    <div class="package-info">
-                                        <h4>Grand colis</h4>
-                                        <p>Max 30kg</p>
-                                        <ul>
-                                            <li>Dimensions max: 80x80x80cm</li>
-                                            <li>Pour objets volumineux</li>
-                                        </ul>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Description améliorée du contenu -->
-                    <div class="form-group content-description">
-                        <label for="packageContent">Description détaillée du contenu</label>
-                        <div class="content-input-container">
-                            <textarea id="packageContent" name="packageContent" rows="3" required 
-                                      placeholder="Décrivez précisément le contenu de votre colis..."></textarea>
-                            <div class="content-guidelines">
-                                <h4>Guidelines :</h4>
-                                <ul>
-                                    <li>✓ Décrivez la nature des objets</li>
-                                    <li>✓ Mentionnez les matériaux</li>
-                                    <li>✓ Indiquez la fragilité</li>
-                                    <li>✓ Précisez les dimensions</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="packageWeight">Poids approximatif (kg)</label>
-                        <input type="number" id="packageWeight" name="packageWeight" min="0" max="30" step="0.1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="urgency">Niveau d'urgence</label>
-                        <select id="urgency" name="urgency" required>
-                            <option value="normal">Standard (2-3 jours)</option>
-                            <option value="express">Express (24h)</option>
-                            <option value="urgent">Ultra urgent (2h)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="fragile" name="fragile">
-                            Colis fragile (manipulation spéciale)
-                        </label>
-                    </div>
-                    <div class="form-buttons">
-                        <button type="button" class="prev-btn">Précédent</button>
-                        <button type="submit" class="submit-btn">Valider l'envoi</button>
-                    </div>
+            <!-- Étape 3: Instructions et validation -->
+            <div class="step-content" id="step3">
+                <h1>Instructions spéciales</h1>
+                <div class="form-group">
+                    <label class="form-label">Instructions pour le livreur</label>
+                    <textarea class="form-input" name="instructions" placeholder="Instructions particulières (optionnel)"></textarea>
                 </div>
-            </form>
-        </div>
-    </main>
+                <div class="form-group">
+                    <label class="form-label">Contact pour la livraison</label>
+                    <input type="tel" class="form-input" name="contact" required placeholder="Numéro de téléphone">
+                </div>
+            </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
+            <div class="navigation-buttons">
+                <button type="button" class="nav-button prev-button" style="display: none;">Précédent</button>
+                <button type="button" class="nav-button next-button">Suivant</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="transition.js"></script>
     <script src="send-package.js"></script>
 </body>
 </html> 

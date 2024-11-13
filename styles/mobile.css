@@ -1,0 +1,80 @@
+/* Styles communs pour mobile */
+@media (max-width: 768px) {
+    /* Layout général */
+    .container {
+        padding: 10px !important;
+        margin: 10px !important;
+    }
+
+    /* Header */
+    .header {
+        flex-direction: column !important;
+        padding: 15px !important;
+    }
+
+    /* Navigation */
+    .nav-links {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    /* Formulaires */
+    .form-input, 
+    .form-select, 
+    .form-button {
+        width: 100% !important;
+        margin: 5px 0 !important;
+    }
+
+    /* Cartes et grilles */
+    .grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Modal */
+    .modal-content {
+        width: 90% !important;
+        margin: 20px auto !important;
+        padding: 15px !important;
+    }
+
+    /* Boutons */
+    .button-group {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    /* Texte */
+    h1 { font-size: 24px !important; }
+    h2 { font-size: 20px !important; }
+    h3 { font-size: 18px !important; }
+}
+
+/* Fix pour le flou sur iOS */
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+    .glass-effect {
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+}
+
+/* Fix pour le scroll sur iOS */
+.scroll-container {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Fix pour les inputs sur iOS */
+input, 
+select, 
+textarea {
+    -webkit-appearance: none;
+    border-radius: 0;
+}
+
+/* Amélioration du tap target */
+button, 
+a, 
+.clickable {
+    min-height: 44px;
+    min-width: 44px;
+} 

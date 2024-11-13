@@ -1,51 +1,41 @@
 const firebaseConfig = {
-    apiKey: "AIzaSyAZ7HRiULg8jkuUcWpiDL1Lfhc4wlMLDbI",
-    authDomain: "livraison-5f7c9.firebaseapp.com",
-    projectId: "livraison-5f7c9",
-    storageBucket: "livraison-5f7c9.firebasestorage.app",
-    messagingSenderId: "326764757981",
-    appId: "1:326764757981:web:f406015028de9528686c34",
-    measurementId: "G-PN5M3M47WV"
+    apiKey: "votre-api-key",
+    authDomain: "votre-project.firebaseapp.com",
+    projectId: "votre-project-id",
+    storageBucket: "votre-project.appspot.com",
+    messagingSenderId: "votre-messaging-sender-id",
+    appId: "votre-app-id"
 };
 
-// Initialiser Firebase
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Obtenir les références des services
+// Initialize Firestore
 const db = firebase.firestore();
-const storage = firebase.storage();
-const auth = firebase.auth();
 
-// Vérifier que Firebase est bien initialisé
-console.log('Firebase initialisé:', firebase.apps.length > 0);
+// Initialize Messaging
+const messaging = firebase.messaging();
 
-// Fonction de test pour vérifier la connexion
-async function testFirebaseConnection() {
+// Fonction pour sauvegarder le token
+async function saveMessagingToken(userId, token) {
     try {
-        // Test Firestore
-        await db.collection('test').doc('test').set({
-            test: 'Connection successful',
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        await db.collection('users').doc(userId).update({
+            messagingTokens: firebase.firestore.FieldValue.arrayUnion(token)
         });
-        console.log('Firestore connection successful');
-
-        // Test Storage
-        const testRef = storage.ref().child('test/test.txt');
-        await testRef.putString('test');
-        console.log('Storage connection successful');
-
-        return true;
     } catch (error) {
-        console.error('Firebase connection error:', error);
-        return false;
+        console.error('Erreur lors de la sauvegarde du token:', error);
     }
 }
 
-// Exécuter le test de connexion
-testFirebaseConnection().then(isConnected => {
-    if (isConnected) {
-        console.log('Firebase est correctement configuré');
-    } else {
-        console.error('Problème de configuration Firebase');
+// Fonction pour sauvegarder l'historique
+async function saveTrackingHistory(trackingId, event) {
+    try {
+        await db.collection('tracking_history').add({
+            trackingId,
+            ...event,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch (error) {
+        console.error('Erreur lors de la sauvegarde de l\'historique:', error);
     }
-});
+}
