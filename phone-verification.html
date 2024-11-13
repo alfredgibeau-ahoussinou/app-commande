@@ -3,25 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vérification du code - ExpressDelivery</title>
+    <title>ExpressDelivery - Vérification du numéro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
-    
-    <script>
-        const firebaseConfig = {
-            // Vos configurations Firebase
-        };
-        firebase.initializeApp(firebaseConfig);
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
         body {
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background: linear-gradient(-45deg, #004d40, #00695c, #01579b, #0277bd);
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
             display: flex;
@@ -30,230 +22,239 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         .verification-container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 40px;
-            width: 90%;
-            max-width: 400px;
             text-align: center;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             border: 1px solid rgba(255, 255, 255, 0.18);
+            width: 90%;
+            max-width: 500px;
+            margin: 20px;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto 40px;
+        }
+
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-step.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #004d40;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%);
         }
 
         h1 {
             color: white;
             font-size: 24px;
             margin-bottom: 20px;
-            font-weight: 600;
         }
 
-        p {
-            color: white;
-            margin-bottom: 30px;
-            font-size: 16px;
+        .phone-form {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        #verificationCode {
+        .input-group {
+            margin-bottom: 25px;
             width: 100%;
-            padding: 15px;
+            max-width: 300px;
+        }
+
+        .phone-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
-            font-size: 24px;
-            outline: none;
-            box-sizing: border-box;
-            text-align: center;
-            letter-spacing: 8px;
-            margin-bottom: 20px;
-        }
-
-        #verificationCode::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-            letter-spacing: normal;
             font-size: 16px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
         }
 
-        #verificationCode:focus {
-            border-color: white;
+        .phone-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
         }
 
-        button[type="submit"] {
-            width: 100%;
-            padding: 15px;
+        .phone-input:focus {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .verification-code {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+            max-width: 300px;
+        }
+
+        .code-input {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 18px;
+            outline: none;
+        }
+
+        .verify-button {
+            padding: 15px 30px;
             border: none;
             border-radius: 10px;
-            background: white;
-            color: #333;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            color: #004d40;
+            width: 100%;
+            max-width: 300px;
+            margin: 15px auto;
+            display: block;
         }
 
-        button[type="submit"]:hover {
+        .verify-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background: white;
         }
 
-        .error-message {
-            color: #ff4444;
-            margin-top: 15px;
-            font-size: 14px;
-            min-height: 20px;
-        }
-
-        .back-link {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: white;
+        .resend-code {
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .back-link:hover {
-            transform: translateX(-5px);
-        }
-
-        .resend-link {
-            color: white;
-            text-decoration: underline;
             font-size: 14px;
-            margin-top: 20px;
-            display: inline-block;
-            cursor: pointer;
+            display: block;
+            margin: 15px auto;
+            text-align: center;
             transition: all 0.3s ease;
         }
 
-        .resend-link:hover {
-            opacity: 0.8;
+        .resend-code:hover {
+            color: white;
+            transform: translateY(-2px);
         }
 
         @media (max-width: 480px) {
-            .verification-container {
-                padding: 30px 20px;
+            .input-group, .verify-button {
+                width: 90%;
             }
 
-            h1 {
-                font-size: 20px;
-            }
-
-            #verificationCode {
-                font-size: 20px;
-                letter-spacing: 6px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            body {
-                animation: none;
-            }
-            
-            button:hover {
-                transform: none;
+            .verification-code {
+                gap: 8px;
             }
         }
     </style>
 </head>
 <body>
-    <a href="login.html" class="back-link">
-        ← Retour
-    </a>
-
     <div class="verification-container">
-        <h1>Vérification du code</h1>
-        <p>Entrez le code reçu par SMS</p>
-        <form id="verificationForm" onsubmit="return verifyCode(event)">
-            <input type="text" 
-                   id="verificationCode" 
-                   maxlength="6" 
-                   pattern="[0-9]{6}" 
-                   required 
-                   placeholder="Code à 6 chiffres"
-                   autocomplete="one-time-code">
-            <button type="submit">Vérifier</button>
-        </form>
-        <p id="errorMessage" class="error-message"></p>
-        <a href="#" class="resend-link" onclick="resendCode(event)">
-            Renvoyer le code
-        </a>
+        <div class="progress-bar">
+            <div class="progress-step active">1</div>
+            <div class="progress-step">2</div>
+            <div class="progress-step">3</div>
+            <div class="progress-step">4</div>
+        </div>
+
+        <h1>Vérification du numéro</h1>
+        <p style="color: white; margin-bottom: 30px;">
+            Entrez votre numéro de téléphone pour recevoir un code de vérification
+        </p>
+
+        <div class="phone-form">
+            <div class="input-group">
+                <input type="tel" class="phone-input" placeholder="Votre numéro de téléphone" id="phoneNumber">
+            </div>
+
+            <button class="verify-button" id="sendCode">Envoyer le code</button>
+
+            <div class="verification-code" style="display: none;">
+                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input">
+                <input type="text" maxlength="1" class="code-input">
+            </div>
+
+            <button class="verify-button" id="verifyCode" style="display: none;">Vérifier le code</button>
+            <a href="#" class="resend-code" style="display: none;">Renvoyer le code</a>
+        </div>
     </div>
 
+    <script src="transition.js"></script>
     <script>
-        function verifyCode(event) {
-            event.preventDefault();
-            const code = document.getElementById('verificationCode').value;
+        document.getElementById('sendCode').addEventListener('click', function() {
+            // Afficher les champs de code
+            document.querySelector('.verification-code').style.display = 'flex';
+            document.getElementById('verifyCode').style.display = 'block';
+            document.querySelector('.resend-code').style.display = 'block';
+            this.style.display = 'none';
             
-            // Pour le numéro de test
-            if (localStorage.getItem('isTestNumber') === 'true') {
-                if (code === '123456') {
-                    localStorage.setItem('userId', 'test-user-id');
-                    localStorage.removeItem('isTestNumber');
-                    window.location.href = 'dashboard.html';
-                } else {
-                    document.getElementById('errorMessage').textContent = 
-                        "Code incorrect. Pour le test, utilisez : 123456";
+            // Masquer l'input du numéro de téléphone
+            document.getElementById('phoneNumber').disabled = true;
+        });
+
+        // Gestion des inputs de code
+        const codeInputs = document.querySelectorAll('.code-input');
+        codeInputs.forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1) {
+                    if (index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
                 }
-                return false;
-            }
-            
-            // Pour les vrais numéros
-            if (window.confirmationResult) {
-                window.confirmationResult.confirm(code)
-                    .then((result) => {
-                        const user = result.user;
-                        localStorage.setItem('userId', user.uid);
-                        window.location.href = 'dashboard.html';
-                    })
-                    .catch((error) => {
-                        document.getElementById('errorMessage').textContent = 
-                            "Code incorrect. Veuillez réessayer.";
-                    });
-            } else {
-                window.location.href = 'login.html';
-            }
-            return false;
-        }
+            });
 
-        // Ajout de la fonction pour renvoyer le code
-        function resendCode(event) {
-            event.preventDefault();
-            const phone = localStorage.getItem('userPhone');
-            
-            if (localStorage.getItem('isTestNumber') === 'true') {
-                alert('Un nouveau code a été envoyé (Code de test : 123456)');
-                return;
-            }
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && !this.value) {
+                    if (index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                }
+            });
+        });
 
-            // Pour les vrais numéros, réutiliser la logique d'envoi de SMS
-            const phoneNumber = '+33' + phone.substring(1);
-            firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
-                .then((confirmationResult) => {
-                    window.confirmationResult = confirmationResult;
-                    alert('Un nouveau code vous a été envoyé');
-                })
-                .catch((error) => {
-                    console.error(error);
-                    alert('Erreur lors de l\'envoi du code. Veuillez réessayer.');
-                });
-        }
-
-        // Focus automatique sur le champ de code
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('verificationCode').focus();
+        document.getElementById('verifyCode').addEventListener('click', function() {
+            // Redirection vers la prochaine étape
+            window.location.href = 'documents-verification.html';
         });
     </script>
 </body>

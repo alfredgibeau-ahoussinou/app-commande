@@ -116,21 +116,75 @@
         }
 
         @media (max-width: 480px) {
+            body {
+                background-size: 200% 200%;
+                animation: gradient 20s ease infinite;
+            }
+
             .check-container {
-                padding: 30px 20px;
-            }
-
-            h1 {
-                font-size: 20px;
-            }
-
-            .description {
-                font-size: 14px;
+                padding: 25px 15px;
+                margin: 15px;
+                backdrop-filter: blur(5px);
             }
 
             .send-button {
-                padding: 12px 20px;
-                font-size: 14px;
+                transition: all 0.2s ease;
+            }
+
+            .send-button:active {
+                transform: translateY(1px);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .send-button:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .logo-container a:hover {
+                transform: none;
+            }
+
+            .logo-container a:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+
+            .logo-container img {
+                width: 100px;
+                height: auto;
+            }
+
+            .icon {
+                font-size: 18px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body {
+                animation: none;
+                background-position: 0% 50%;
+            }
+            
+            .send-button, 
+            .logo-container a {
+                transition: none;
+                transform: none;
+            }
+
+            .send-button:hover,
+            .send-button:active,
+            .logo-container a:hover,
+            .logo-container a:active {
+                transform: none;
+                box-shadow: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) and (max-width: 480px) {
+            .check-container {
+                backdrop-filter: none;
+                background: rgba(255, 255, 255, 0.2);
             }
         }
 
