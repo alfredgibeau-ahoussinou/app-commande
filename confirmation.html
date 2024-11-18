@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation - ExpressDelivery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, 
+                #c45f41,
+                #b82e60,
+                #1a7fa3,
+                #1aa383
+            );
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .confirmation-container {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .success-animation {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: rgba(46, 213, 115, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse 2s infinite;
+        }
+
+        .success-icon {
+            font-size: 50px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .tracking-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tracking-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #23d5ab;
+            margin: 10px 0;
+        }
+
+        .info-text {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: grid;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-button {
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .primary-button {
+            background: linear-gradient(45deg, #1a7fa3, #1aa383);
+            color: white;
+        }
+
+        .secondary-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .confirmation-details {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .confirmation-container {
+                padding: 20px;
+            }
+
+            .tracking-number {
+                font-size: 20px;
+            }
+
+            .action-button {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <div class="success-animation">
+            <span class="success-icon">✓</span>
+        </div>
+        
+        <h1>Commande confirmée !</h1>
+        <p class="info-text">Votre paiement a été traité avec succès</p>
+
+        <div class="tracking-info">
+            <p>Votre numéro de suivi</p>
+            <div class="tracking-number" id="trackingNumber">ED-123456789</div>
+            <button onclick="copyTrackingNumber()" class="secondary-button action-button">
+                Copier le numéro
+            </button>
+        </div>
+
+        <div class="confirmation-details">
+            <div class="detail-item">
+                <span>Date d'envoi</span>
+                <span id="sendDate">23 Mars 2024</span>
+            </div>
+            <div class="detail-item">
+                <span>Livraison estimée</span>
+                <span id="deliveryDate">25 Mars 2024</span>
+            </div>
+            <div class="detail-item">
+                <span>Montant total</span>
+                <span id="totalAmount">15.98 €</span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="tracking.html" class="action-button primary-button">
+                Suivre mon colis
+            </a>
+            <a href="index.html" class="action-button secondary-button">
+                Retour à l'accueil
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function copyTrackingNumber() {
+            const trackingNumber = document.getElementById('trackingNumber').innerText;
+            navigator.clipboard.writeText(trackingNumber).then(() => {
+                const button = event.target;
+                const originalText = button.innerText;
+                button.innerText = 'Copié !';
+                setTimeout(() => {
+                    button.innerText = originalText;
+                }, 2000);
+            });
+        }
+
+        // Récupérer et afficher les détails de la commande
+        window.onload = function() {
+            const orderDetails = JSON.parse(sessionStorage.getItem('orderDetails') || '{}');
+            if (orderDetails.trackingNumber) {
+                document.getElementById('trackingNumber').innerText = orderDetails.trackingNumber;
+            }
+            if (orderDetails.totalAmount) {
+                document.getElementById('totalAmount').innerText = orderDetails.totalAmount + ' €';
+            }
+
+            // Générer les dates
+            const today = new Date();
+            const deliveryDate = new Date(today);
+            deliveryDate.setDate(today.getDate() + 2); // +2 jours pour la livraison
+
+            document.getElementById('sendDate').innerText = today.toLocaleDateString('fr-FR');
+            document.getElementById('deliveryDate').innerText = deliveryDate.toLocaleDateString('fr-FR');
+        };
+    </script>
+</body>
+</html> 
