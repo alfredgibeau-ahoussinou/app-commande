@@ -81,106 +81,99 @@
         }
 
         .phone-form {
-            margin-top: 30px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         .input-group {
-            margin-bottom: 25px;
-            width: 100%;
-            max-width: 300px;
+            position: relative;
         }
 
         .phone-input {
             width: 100%;
-            max-width: 300px;
-            padding: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
             font-size: 16px;
-            text-align: center;
-            outline: none;
             transition: all 0.3s ease;
         }
 
-        .phone-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
         .phone-input:focus {
-            border-color: rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            border-color: #23d5ab;
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .verification-code {
             display: flex;
             gap: 10px;
             justify-content: center;
-            margin: 20px auto;
-            max-width: 300px;
+            margin: 20px 0;
         }
 
         .code-input {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
-            font-size: 18px;
+        }
+
+        .code-input:focus {
             outline: none;
+            border-color: #23d5ab;
         }
 
         .verify-button {
-            padding: 15px 30px;
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #004d40;
             border: none;
             border-radius: 10px;
             font-size: 16px;
-            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-            color: #004d40;
-            width: 100%;
-            max-width: 300px;
-            margin: 15px auto;
-            display: block;
         }
 
         .verify-button:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            background: white;
+        }
+
+        .verify-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .resend-code {
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             font-size: 14px;
-            display: block;
-            margin: 15px auto;
-            text-align: center;
-            transition: all 0.3s ease;
+            transition: color 0.3s ease;
         }
 
         .resend-code:hover {
             color: white;
-            transform: translateY(-2px);
         }
 
-        @media (max-width: 480px) {
-            .input-group, .verify-button {
-                width: 90%;
-            }
+        /* Animation pour les erreurs */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
 
-            .verification-code {
-                gap: 8px;
-            }
+        .error {
+            animation: shake 0.5s ease-in-out;
+            border-color: #ff4757 !important;
         }
     </style>
 </head>
@@ -219,54 +212,133 @@
         </div>
     </div>
 
-    <script src="js/transition.js"></script>
+    <script src="js/rate-limiter.js"></script>
+    <script src="js/logger.js"></script>
+    <script src="js/phone-verification.js"></script>
     <script>
-        document.getElementById('sendCode').addEventListener('click', function() {
-            // Afficher les champs de code
-            document.querySelector('.verification-code').style.display = 'flex';
-            document.getElementById('verifyCode').style.display = 'block';
-            document.querySelector('.resend-code').style.display = 'block';
-            this.style.display = 'none';
-            
-            // Masquer l'input du numéro de téléphone
-            document.getElementById('phoneNumber').disabled = true;
-        });
+        document.addEventListener('DOMContentLoaded', () => {
+            const phoneVerification = new PhoneVerification();
+            const phoneInput = document.getElementById('phoneNumber');
+            const sendCodeBtn = document.getElementById('sendCode');
+            const verifyCodeBtn = document.getElementById('verifyCode');
+            const codeInputs = document.querySelectorAll('.code-input');
+            const resendLink = document.querySelector('.resend-code');
 
-        // Gestion des inputs de code
-        const codeInputs = document.querySelectorAll('.code-input');
-        codeInputs.forEach((input, index) => {
-            input.addEventListener('input', function() {
-                if (this.value.length === 1) {
-                    if (index < codeInputs.length - 1) {
-                        codeInputs[index + 1].focus();
+            // Validation du numéro de téléphone
+            phoneInput.addEventListener('input', (e) => {
+                let number = e.target.value.replace(/\D/g, '');
+                
+                if (number.length > 0) {
+                    if (number.startsWith('33')) {
+                        number = '+33 ' + number.slice(2).match(/.{1,2}/g).join(' ');
+                    } else {
+                        number = number.match(/.{1,2}/g).join(' ');
                     }
+                }
+                
+                e.target.value = number;
+                
+                const isValidNumber = /^(\+33|0)[1-9](\d{2}){4}$/.test(number.replace(/\s/g, ''));
+                sendCodeBtn.disabled = !isValidNumber;
+            });
+
+            // Envoi du code
+            sendCodeBtn.addEventListener('click', async () => {
+                try {
+                    const number = phoneInput.value.replace(/\s/g, '');
+                    console.log('Envoi du code au numéro:', number); // Pour le débogage
+
+                    const result = await phoneVerification.sendVerificationCode(number);
+                    console.log('Résultat de l\'envoi:', result); // Pour le débogage
+
+                    if (result.success) {
+                        phoneInput.disabled = true;
+                        document.querySelector('.verification-code').style.display = 'flex';
+                        verifyCodeBtn.style.display = 'block';
+                        resendLink.style.display = 'block';
+                        sendCodeBtn.style.display = 'none';
+                        codeInputs[0].focus();
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error); // Pour le débogage
+                    phoneInput.classList.add('error');
+                    setTimeout(() => phoneInput.classList.remove('error'), 500);
+                    alert(error.message);
                 }
             });
 
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace' && !this.value) {
-                    if (index > 0) {
+            // Gestion des inputs de code
+            codeInputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    if (e.target.value.length === 1) {
+                        if (index < codeInputs.length - 1) {
+                            codeInputs[index + 1].focus();
+                        }
+                        checkCode();
+                    }
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
                         codeInputs[index - 1].focus();
                     }
+                });
+            });
+
+            // Vérification du code
+            function checkCode() {
+                const code = Array.from(codeInputs).map(input => input.value).join('');
+                verifyCodeBtn.disabled = code.length !== 6;
+            }
+
+            verifyCodeBtn.addEventListener('click', async () => {
+                const code = Array.from(codeInputs).map(input => input.value).join('');
+                const number = phoneInput.value.replace(/\s/g, '');
+
+                try {
+                    const result = await phoneVerification.verifyCode(number, code);
+                    
+                    if (result.success) {
+                        window.location.href = 'documents-verification.html';
+                    } else {
+                        throw new Error('Code invalide');
+                    }
+                } catch (error) {
+                    codeInputs.forEach(input => {
+                        input.classList.add('error');
+                        input.value = '';
+                    });
+                    setTimeout(() => {
+                        codeInputs.forEach(input => input.classList.remove('error'));
+                    }, 500);
+                    codeInputs[0].focus();
+                    alert(error.message);
                 }
             });
-        });
 
-        document.getElementById('verifyCode').addEventListener('click', async function() {
-            const code = Array.from(document.querySelectorAll('.code-input'))
-                .map(input => input.value)
-                .join('');
-            
-            try {
-                const response = await verifyPhoneCode(code);
-                if (response.verified) {
-                    window.location.href = 'documents-verification.html';
-                } else {
-                    alert('Code invalide. Veuillez réessayer.');
+            // Renvoi du code
+            resendLink.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const number = phoneInput.value.replace(/\s/g, '');
+                try {
+                    // Réinitialiser les champs de code
+                    codeInputs.forEach(input => {
+                        input.value = '';
+                        input.classList.remove('error');
+                    });
+                    
+                    // Renvoyer le code
+                    await phoneVerification.resendCode(number);
+                    
+                    // Remettre le focus sur le premier champ de code
+                    codeInputs[0].focus();
+                    
+                    // Désactiver le bouton de vérification
+                    verifyCodeBtn.disabled = true;
+                } catch (error) {
+                    alert(error.message);
                 }
-            } catch (error) {
-                alert('Une erreur est survenue. Veuillez réessayer.');
-            }
+            });
         });
     </script>
 </body>

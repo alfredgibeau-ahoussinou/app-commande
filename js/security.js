@@ -1,9 +1,21 @@
 class Security {
     static async initializeSecurity() {
+        // Vérifier les cookies en premier
+        if (!this.checkCookiesEnabled()) {
+            return;
+        }
+
+        // Continuer avec les autres initialisations
         this.setupCSP();
         this.setupXSRFProtection();
         this.setupInputSanitization();
         this.monitorSuspiciousActivity();
+
+        // Vérifier les préférences de cookies existantes
+        const preferences = localStorage.getItem('cookiePreferences');
+        if (!preferences) {
+            document.getElementById('cookieBanner').style.display = 'block';
+        }
     }
 
     // Protection contre les attaques XSS
@@ -134,6 +146,121 @@ class Security {
 
         if (file.size > maxSize) {
             throw new Error('Fichier trop volumineux');
+        }
+
+        return true;
+    }
+
+    // Ajouter cette méthode à la classe Security
+    static checkCookiesEnabled() {
+        // Vérifier si les cookies sont activés
+        if (!navigator.cookieEnabled) {
+            this.showCookieWarning();
+            return false;
+        }
+
+        // Tester la création d'un cookie
+        try {
+            document.cookie = "testcookie=1; SameSite=Strict; Secure";
+            const cookieEnabled = document.cookie.indexOf("testcookie") !== -1;
+            
+            // Supprimer le cookie de test
+            document.cookie = "testcookie=1; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            
+            if (!cookieEnabled) {
+                this.showCookieWarning();
+                return false;
+            }
+            
+            return true;
+        } catch (error) {
+            Logger.error('Erreur lors de la vérification des cookies', error);
+            this.showCookieWarning();
+            return false;
+        }
+    }
+
+    static showCookieWarning() {
+        const warningDiv = document.createElement('div');
+        warningDiv.className = 'cookie-warning';
+        warningDiv.innerHTML = `
+            <div class="cookie-warning-content">
+                <h3>Cookies désactivés</h3>
+                <p>Les cookies sont nécessaires au bon fonctionnement du site. Veuillez les activer pour continuer.</p>
+                <button onclick="location.reload()">Réessayer</button>
+            </div>
+        `;
+        document.body.appendChild(warningDiv);
+
+        // Ajouter les styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .cookie-warning {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.9);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+            .cookie-warning-content {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                text-align: center;
+                max-width: 400px;
+                margin: 20px;
+            }
+            .cookie-warning h3 {
+                color: #333;
+                margin: 0 0 15px 0;
+            }
+            .cookie-warning p {
+                color: #666;
+                margin: 0 0 20px 0;
+            }
+            .cookie-warning button {
+                background: #1a7fa3;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+            .cookie-warning button:hover {
+                background: #1aa383;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    static setEssentialCookies() {
+        const essentialCookies = {
+            'session_secure': '1',
+            'csrf_token': this.generateCSRFToken(),
+            'cookie_consent': 'essential'
+        };
+
+        for (const [name, value] of Object.entries(essentialCookies)) {
+            document.cookie = `${name}=${value}; path=/; SameSite=Strict; Secure; max-age=86400`;
+        }
+    }
+
+    static checkEssentialCookies() {
+        const requiredCookies = ['session_secure', 'csrf_token', 'cookie_consent'];
+        const missingCookies = requiredCookies.filter(name => 
+            !document.cookie.split(';').some(c => c.trim().startsWith(`${name}=`))
+        );
+
+        if (missingCookies.length > 0) {
+            Logger.warn('Cookies essentiels manquants', { missingCookies });
+            this.setEssentialCookies();
+            return false;
         }
 
         return true;

@@ -299,6 +299,442 @@
                 left: -20px;
             }
         }
+
+        .privacy-widget {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .privacy-widget-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a7fa3, #1aa383);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .privacy-widget-toggle:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #23a6d5, #23d5ab);
+        }
+
+        .privacy-icon {
+            font-size: 24px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .privacy-widget-content {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            width: 320px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            opacity: 0;
+            pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .privacy-widget-content.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: all;
+        }
+
+        .privacy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .privacy-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .close-privacy {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .privacy-section {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .privacy-section h4 {
+            color: #1a7fa3;
+            margin: 0 0 5px 0;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .privacy-section p {
+            color: #333333;
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .privacy-links {
+            display: grid;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .privacy-links a {
+            color: #1a7fa3;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+            display: block;
+        }
+
+        .privacy-links a:hover {
+            background: rgba(26, 127, 163, 0.1);
+        }
+
+        .save-preferences {
+            width: 100%;
+            padding: 10px;
+            background: #1a7fa3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-preferences:hover {
+            background: #1aa383;
+        }
+
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            display: none;
+            color: #333333;
+        }
+
+        .cookie-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cookie-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cookie-buttons button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .accept-all {
+            background: #1aa383;
+            color: white;
+        }
+
+        .customize {
+            background: #1a7fa3;
+            color: white;
+        }
+
+        .accept-essential {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .privacy-widget {
+                bottom: 25px;
+            }
+
+            .privacy-widget-toggle {
+                width: 55px;
+                height: 55px;
+            }
+
+            .privacy-widget-content {
+                width: calc(100% - 40px);
+                max-width: 320px;
+                bottom: 70px;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .privacy-widget-toggle {
+                    transition: none;
+                }
+
+                .privacy-widget-toggle:hover {
+                    transform: none;
+                }
+
+                .privacy-icon {
+                    animation: none;
+                }
+            }
+        }
+
+        /* Styles mobiles améliorés */
+        @media (max-width: 768px) {
+            /* Navigation */
+            .menu-toggle {
+                display: block;
+            }
+
+            nav ul {
+                display: none;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.9);
+                padding: 20px;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav ul.show {
+                display: flex;
+            }
+
+            nav ul li {
+                margin: 10px 0;
+            }
+
+            /* Section héro */
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .hero-logo img {
+                width: 100px;
+            }
+
+            .logo-text {
+                font-size: 24px;
+            }
+
+            /* Boutons CTA */
+            .cta-buttons {
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+
+            .cta-button {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            /* Chat et Contact */
+            .chatbot-container,
+            .contact-container {
+                bottom: 15px;
+            }
+
+            .chatbot-box,
+            .contact-box {
+                width: calc(100vw - 30px);
+                max-height: 80vh;
+                bottom: 60px;
+            }
+
+            .chatbot-toggle,
+            .contact-toggle {
+                width: 45px;
+                height: 45px;
+            }
+
+            /* Widget de confidentialité */
+            .privacy-widget {
+                bottom: 15px;
+            }
+
+            .privacy-widget-toggle {
+                width: 45px;
+                height: 45px;
+            }
+
+            .privacy-widget-content {
+                width: calc(100vw - 30px);
+                max-width: none;
+                bottom: 70px;
+                padding: 15px;
+            }
+
+            /* Bannière de cookies */
+            .cookie-banner {
+                padding: 15px;
+            }
+
+            .cookie-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .cookie-buttons {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .cookie-buttons button {
+                width: 100%;
+                padding: 10px;
+            }
+
+            /* Animations optimisées */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation: none !important;
+                    transition: none !important;
+                }
+            }
+        }
+
+        /* Ajustements pour très petits écrans */
+        @media (max-width: 360px) {
+            .hero-logo img {
+                width: 80px;
+            }
+
+            .logo-text {
+                font-size: 20px;
+            }
+
+            .privacy-widget-content {
+                font-size: 13px;
+            }
+
+            .privacy-section {
+                padding: 8px;
+            }
+        }
+
+        /* Support pour le mode sombre */
+        @media (prefers-color-scheme: dark) {
+            .privacy-widget-content,
+            .cookie-banner {
+                background: rgba(33, 33, 33, 0.98);
+                color: white;
+            }
+
+            .privacy-section {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .privacy-section h4 {
+                color: #23d5ab;
+            }
+
+            .privacy-section p {
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            .privacy-links a {
+                color: #23d5ab;
+            }
+
+            .privacy-links a:hover {
+                background: rgba(35, 213, 171, 0.1);
+            }
+
+            .cookie-banner {
+                background: rgba(33, 33, 33, 0.98);
+                color: white;
+            }
+
+            .cookie-buttons button {
+                background: #1a7fa3;
+                color: white;
+            }
+        }
+
+        .chatbot-icon {
+            font-size: 24px;
+            animation: pulse 2s infinite;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .chatbot-toggle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a7fa3, #1aa383);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
     </style>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
     <meta http-equiv="X-Frame-Options" content="DENY">
@@ -343,7 +779,7 @@
 
     <div class="chatbot-container">
         <div class="chatbot-toggle">
-            <span class="chatbot-icon">📦</span>
+            <span class="chatbot-icon">💬</span>
         </div>
         <div class="chatbot-box hidden">
             <div class="chatbot-header">
@@ -356,21 +792,13 @@
                 </div>
             </div>
             <div class="chatbot-input">
-                <input type="text" placeholder="crivez votre message...">
+                <input type="text" placeholder="Écrivez votre message...">
                 <button class="send-message">➤</button>
             </div>
         </div>
     </div>
     <script src="js/chatbot.js"></script>
     <script src="js/transition.js"></script>
-
-    <!-- Ajout du bouton de suivi -->
-    <div class="tracking-button-container">
-        <a href="tracking.html" class="tracking-button">
-            <span class="icon">📦</span>
-            <span>Suivre mon colis</span>
-        </a>
-    </div>
 
     <!-- Remplacer la section contact par -->
     <div class="contact-container">
@@ -457,5 +885,129 @@
     <script src="js/server-validation.js"></script>
     <script src="js/error-handler.js"></script>
     <script src="js/logger.js"></script>
+
+    <!-- Widget de cookies et confidentialité -->
+    <div class="privacy-widget" id="privacyWidget">
+        <div class="privacy-widget-toggle">
+            <span class="privacy-icon">🔒</span>
+        </div>
+        <div class="privacy-widget-content hidden">
+            <div class="privacy-header">
+                <h3>Paramètres de confidentialité</h3>
+                <button class="close-privacy">×</button>
+            </div>
+            <div class="privacy-sections">
+                <div class="privacy-section">
+                    <h4>Cookies essentiels</h4>
+                    <p>Nécessaires au fonctionnement du site</p>
+                    <label class="switch">
+                        <input type="checkbox" checked disabled>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="privacy-section">
+                    <h4>Cookies analytiques</h4>
+                    <p>Nous aident à améliorer votre expérience</p>
+                    <label class="switch">
+                        <input type="checkbox" id="analyticsCookies">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="privacy-section">
+                    <h4>Cookies marketing</h4>
+                    <p>Personnalisation des publicités</p>
+                    <label class="switch">
+                        <input type="checkbox" id="marketingCookies">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="privacy-links">
+                <a href="privacy-policy.html">Politique de confidentialité</a>
+                <a href="terms.html">Conditions d'utilisation</a>
+                <a href="security.html">Politique de sécurité</a>
+                <a href="location-policy.html">Politique de localisation</a>
+            </div>
+            <button class="save-preferences">Sauvegarder mes préférences</button>
+        </div>
+    </div>
+
+    <!-- Banner de cookies -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-content">
+            <p>Nous utilisons des cookies pour améliorer votre expérience. En continuant, vous acceptez notre utilisation des cookies.</p>
+            <div class="cookie-buttons">
+                <button class="accept-all">Tout accepter</button>
+                <button class="customize">Personnaliser</button>
+                <button class="accept-essential">Accepter l'essentiel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ajouter le script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const privacyWidget = document.getElementById('privacyWidget');
+            const privacyContent = privacyWidget.querySelector('.privacy-widget-content');
+            const privacyToggle = privacyWidget.querySelector('.privacy-widget-toggle');
+            const closePrivacy = privacyWidget.querySelector('.close-privacy');
+            const cookieBanner = document.getElementById('cookieBanner');
+            
+            // Vérifier si les préférences sont déjà définies
+            if (!localStorage.getItem('cookiePreferences')) {
+                cookieBanner.style.display = 'block';
+            }
+
+            privacyToggle.addEventListener('click', () => {
+                privacyContent.classList.toggle('show');
+            });
+
+            closePrivacy.addEventListener('click', () => {
+                privacyContent.classList.remove('show');
+            });
+
+            document.querySelector('.accept-all').addEventListener('click', () => {
+                acceptAllCookies();
+                cookieBanner.style.display = 'none';
+            });
+
+            document.querySelector('.customize').addEventListener('click', () => {
+                privacyContent.classList.add('show');
+                cookieBanner.style.display = 'none';
+            });
+
+            document.querySelector('.accept-essential').addEventListener('click', () => {
+                acceptEssentialCookies();
+                cookieBanner.style.display = 'none';
+            });
+
+            document.querySelector('.save-preferences').addEventListener('click', () => {
+                savePreferences();
+                privacyContent.classList.remove('show');
+            });
+
+            function acceptAllCookies() {
+                document.getElementById('analyticsCookies').checked = true;
+                document.getElementById('marketingCookies').checked = true;
+                savePreferences();
+            }
+
+            function acceptEssentialCookies() {
+                document.getElementById('analyticsCookies').checked = false;
+                document.getElementById('marketingCookies').checked = false;
+                savePreferences();
+            }
+
+            function savePreferences() {
+                const preferences = {
+                    analytics: document.getElementById('analyticsCookies').checked,
+                    marketing: document.getElementById('marketingCookies').checked,
+                    essential: true,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
+            }
+        });
+    </script>
 </body>
 </html> 

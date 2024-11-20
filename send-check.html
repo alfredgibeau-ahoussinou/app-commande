@@ -205,6 +205,108 @@
                 transform: none;
             }
         }
+
+        /* Style pour le bouton de suivi */
+        .tracking-button-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: auto;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateX(-50%) translateY(0px);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+            100% {
+                transform: translateX(-50%) translateY(0px);
+            }
+        }
+
+        .tracking-button {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 10px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(31, 38, 135, 0.15);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            font-size: 14px;
+        }
+
+        .tracking-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.25);
+            background: white;
+        }
+
+        .tracking-button .icon {
+            font-size: 18px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Support pour la réduction de mouvement */
+        @media (prefers-reduced-motion: reduce) {
+            .tracking-button-container,
+            .tracking-button .icon {
+                animation: none;
+            }
+
+            .tracking-button:hover {
+                transform: none;
+            }
+        }
+
+        /* Styles responsives */
+        @media (max-width: 768px) {
+            .tracking-button-container {
+                bottom: 15px;
+                width: auto;
+                max-width: 250px;
+            }
+
+            .tracking-button {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+
+            .tracking-button .icon {
+                font-size: 16px;
+            }
+
+            @keyframes float {
+                0%, 100% {
+                    transform: translateX(-50%) translateY(0px);
+                }
+                50% {
+                    transform: translateX(-50%) translateY(-5px);
+                }
+            }
+        }
     </style>
     <meta name="description" content="Envoyez facilement vos colis avec ExpressDelivery">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -230,6 +332,12 @@
                 <span>Utiliser mon compte</span>
             </a>
         </div>
+    </div>
+    <div class="tracking-button-container">
+        <a href="tracking.html" class="tracking-button">
+            <span class="icon">📦</span>
+            <span>Suivre mon colis</span>
+        </a>
     </div>
     <script src="transition.js"></script>
 </body>
