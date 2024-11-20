@@ -576,7 +576,49 @@
             border-radius: 8px;
             display: none;
         }
+
+        .analysis-results {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .analysis-result {
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .analysis-result.valid {
+            background: rgba(46, 213, 115, 0.1);
+        }
+
+        .analysis-result.invalid {
+            background: rgba(255, 71, 87, 0.1);
+        }
+
+        .analysis-result h4 {
+            margin: 0 0 10px 0;
+            color: white;
+        }
+
+        .analysis-result p {
+            margin: 5px 0;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .analysis-result .error {
+            color: #ff4757;
+        }
+
+        .analysis-result .suggestion {
+            color: #70a1ff;
+            font-style: italic;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <script type="module" src="js/image-recognition.js"></script>
 </head>
 <body>
     <div class="container">
@@ -625,16 +667,17 @@
                             <div class="upload-container" id="upload-container">
                                 <input type="file" 
                                        id="package-media" 
-                                       accept="image/*,video/*" 
+                                       accept="image/*"
                                        class="file-input"
                                        required
-                                       onchange="handleFileSelect(event)">
+                                       onchange="handleFileUpload(event)">
                                 <div class="upload-placeholder">
                                     <span class="upload-icon">📸</span>
                                     <span class="upload-text">Glissez ou cliquez pour ajouter</span>
-                                    <span class="upload-subtext">JPG, PNG ou vidéo courte</span>
+                                    <span class="upload-subtext">JPG ou PNG uniquement</span>
                                 </div>
                                 <div class="preview-container" id="preview-container"></div>
+                                <div class="analysis-results" id="analysis-results"></div>
                             </div>
                         </div>
                     </div>
@@ -801,24 +844,42 @@
             const requiredFields = currentSection.querySelectorAll('[required]');
             
             let isValid = true;
+            let firstInvalid = null;
+
             requiredFields.forEach(field => {
-                if (field.type === 'file') {
-                    if (!field.files || field.files.length === 0) {
-                        isValid = false;
-                        showError("La photo du colis est obligatoire");
-                        field.closest('.upload-container').classList.add('error');
-                    } else {
-                        field.closest('.upload-container').classList.remove('error');
-                    }
-                } else {
-                    if (!field.value.trim()) {
+                // Validation spécifique pour les emails
+                if (field.type === 'email' && field.value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(field.value)) {
                         isValid = false;
                         field.classList.add('error');
-                    } else {
-                        field.classList.remove('error');
+                        if (!firstInvalid) firstInvalid = field;
+                        return;
                     }
                 }
+                
+                // Validation spécifique pour les numéros de téléphone
+                if (field.type === 'tel' && field.value) {
+                    const phoneRegex = /^(\+33|0)[1-9](\d{2}){4}$/;
+                    if (!phoneRegex.test(field.value.replace(/\s/g, ''))) {
+                        isValid = false;
+                        field.classList.add('error');
+                        if (!firstInvalid) firstInvalid = field;
+                        return;
+                    }
+                }
+
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('error');
+                    if (!firstInvalid) firstInvalid = field;
+                }
             });
+
+            if (firstInvalid) {
+                firstInvalid.focus();
+                showError("Veuillez remplir tous les champs obligatoires correctement");
+            }
 
             return isValid;
         }
@@ -906,60 +967,90 @@
         // Initialisation
         updatePrice();
 
-        function handleFileSelect(event) {
+        function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            const previewContainer = document.getElementById('preview-container');
-            const uploadPlaceholder = document.querySelector('.upload-placeholder');
-            
-            // Vérifier la taille du fichier (max 10MB)
-            if (file.size > 10 * 1024 * 1024) {
-                alert('Le fichier est trop volumineux. Taille maximum : 10MB');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewContainer.innerHTML = '';
+            try {
+                // Afficher l'aperçu
+                const preview = document.getElementById('preview-container');
+                const reader = new FileReader();
                 
-                // Créer le bouton de suppression
-                const removeButton = document.createElement('button');
-                removeButton.className = 'remove-media';
-                removeButton.innerHTML = '×';
-                removeButton.onclick = function(e) {
-                    e.stopPropagation();
-                    clearFileInput();
-                };
-
-                // Créer l'élément média approprié
-                if (file.type.startsWith('image/')) {
-                    const img = document.createElement('img');
+                reader.onload = async function(e) {
+                    // Créer et afficher l'image
+                    const img = new Image();
                     img.src = e.target.result;
-                    previewContainer.appendChild(img);
-                } else if (file.type.startsWith('video/')) {
-                    const video = document.createElement('video');
-                    video.src = e.target.result;
-                    video.controls = true;
-                    previewContainer.appendChild(video);
-                }
-
-                previewContainer.appendChild(removeButton);
-                uploadPlaceholder.style.display = 'none';
-                previewContainer.style.display = 'flex';
-            };
-            reader.readAsDataURL(file);
+                    preview.innerHTML = '';
+                    preview.appendChild(img);
+                    preview.style.display = 'flex';
+                    
+                    // Analyser l'image
+                    try {
+                        const results = await imageRecognition.analyzePackageImage(img);
+                        displayResults(results);
+                        
+                        // Vérifier les objets interdits
+                        const prohibitedCheck = await imageRecognition.detectProhibitedItems(img);
+                        if (!prohibitedCheck.isValid) {
+                            ErrorHandler.showError('FILE_VALIDATION', {
+                                message: prohibitedCheck.message
+                            });
+                            clearUpload();
+                            return;
+                        }
+                        
+                        // Analyser les dimensions
+                        const dimensions = await imageRecognition.analyzeDimensions(img);
+                        updatePackageType(dimensions);
+                    } catch (error) {
+                        ErrorHandler.showError('FILE_VALIDATION', {
+                            message: error.message
+                        });
+                    }
+                };
+                
+                reader.readAsDataURL(file);
+            } catch (error) {
+                ErrorHandler.showError('FILE_VALIDATION', {
+                    message: "Erreur lors du traitement de l'image"
+                });
+            }
         }
 
-        function clearFileInput() {
-            const input = document.getElementById('package-media');
-            const previewContainer = document.getElementById('preview-container');
-            const uploadPlaceholder = document.querySelector('.upload-placeholder');
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('analysis-results');
+            resultsContainer.innerHTML = `
+                <div class="analysis-result ${results.isValid ? 'valid' : 'invalid'}">
+                    <h4>Analyse du colis</h4>
+                    ${results.isValid ? `
+                        <p>Type détecté: ${results.packageType}</p>
+                        <p>Confiance: ${Math.round(results.confidence * 100)}%</p>
+                    ` : `
+                        <p class="error">${results.message}</p>
+                        <p class="suggestion">${results.suggestion}</p>
+                    `}
+                </div>
+            `;
+        }
 
+        function updatePackageType(dimensions) {
+            const packageTypeSelect = document.getElementById('packageType');
+            if (packageTypeSelect && dimensions.recommendations) {
+                packageTypeSelect.value = dimensions.recommendations.type;
+                // Mettre à jour le prix
+                updatePrice();
+            }
+        }
+
+        function clearUpload() {
+            const input = document.getElementById('package-media');
+            const preview = document.getElementById('preview-container');
+            const results = document.getElementById('analysis-results');
+            
             input.value = '';
-            previewContainer.innerHTML = '';
-            previewContainer.style.display = 'none';
-            uploadPlaceholder.style.display = 'flex';
+            preview.innerHTML = '';
+            preview.style.display = 'none';
+            results.innerHTML = '';
         }
 
         // Ajout du support drag & drop

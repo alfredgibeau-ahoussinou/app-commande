@@ -271,9 +271,51 @@
             input.value = input.value.replace(/\D/g, '');
         }
 
+        function validateCardNumber(number) {
+            // Algorithme de Luhn
+            let sum = 0;
+            let isEven = false;
+            
+            // Retirer les espaces
+            number = number.replace(/\s/g, '');
+            
+            for (let i = number.length - 1; i >= 0; i--) {
+                let digit = parseInt(number[i]);
+                
+                if (isEven) {
+                    digit *= 2;
+                    if (digit > 9) {
+                        digit -= 9;
+                    }
+                }
+                
+                sum += digit;
+                isEven = !isEven;
+            }
+            
+            return sum % 10 === 0;
+        }
+
         function processPayment(event) {
             event.preventDefault();
             
+            const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
+            const expiry = document.getElementById('expiry').value;
+            const cvv = document.getElementById('cvv').value;
+            
+            if (!validateCardNumber(cardNumber)) {
+                alert('Numéro de carte invalide');
+                return false;
+            }
+            
+            // Vérifier la date d'expiration
+            const [month, year] = expiry.split('/');
+            const expiryDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
+            if (expiryDate < new Date()) {
+                alert('Carte expirée');
+                return false;
+            }
+
             // Simuler un chargement
             const button = document.querySelector('.pay-button');
             button.textContent = 'Traitement en cours...';
